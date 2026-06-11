@@ -214,6 +214,15 @@ class TestFindBookByTitle:
         assert result is not None
         assert result.author == "Frank Herbert"
 
+    def test_treats_titles_with_distinct_surrounding_whitespace_as_different_books(self, collection):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+        collection.add_book(" Dune ", "Whitespace Author", 1966)
+
+        result = collection.find_book_by_title(" Dune ")
+
+        assert result is not None
+        assert result.author == "Whitespace Author"
+
     def test_returns_none_when_book_does_not_exist(self, collection):
         assert collection.find_book_by_title("Missing") is None
 
@@ -264,17 +273,55 @@ class TestRemoveBook:
 
         assert collection.find_book_by_title("The Hobbit") is None
 
-    def test_raises_when_book_does_not_exist(self, collection):
+    def test_returns_not_found_feedback_for_empty_collection(self, collection):
         with pytest.raises(BookNotFoundError, match='Book "Nonexistent Book" was not found.'):
             collection.remove_book("Nonexistent Book")
 
     def test_does_not_remove_book_by_partial_title_match(self, collection):
         collection.add_book("The Hobbit", "J.R.R. Tolkien", 1937)
 
-        with pytest.raises(BookNotFoundError, match='Book "Hobbit" was not found.'):
+        with pytest.raises(
+            BookNotFoundError,
+            match=r'Book "Hobbit" was not found\. Did you mean "The Hobbit"\?',
+        ):
             collection.remove_book("Hobbit")
 
         assert collection.find_book_by_title("The Hobbit") is not None
+
+    def test_removes_book_case_insensitively(self, collection):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+
+        collection.remove_book("dUnE")
+
+        assert collection.find_book_by_title("Dune") is None
+
+    def test_removes_whitespace_variant_without_removing_exact_title(self, collection):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+        collection.add_book(" Dune ", "Whitespace Author", 1966)
+
+        collection.remove_book(" Dune ")
+
+        remaining_titles = [book.title for book in collection.list_books()]
+        assert remaining_titles == ["Dune"]
+
+    def test_returns_helpful_feedback_when_book_is_not_found(self, collection):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+        collection.add_book("Dune Messiah", "Frank Herbert", 1969)
+
+        with pytest.raises(
+            BookNotFoundError,
+            match=r'Book "Dunee" was not found\. Did you mean "Dune"\?',
+        ):
+            collection.remove_book("Dunee")
+
+    def test_preserves_original_input_in_not_found_feedback(self, collection):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+
+        with pytest.raises(
+            BookNotFoundError,
+            match=r'Book " Dune " was not found\. Did you mean "Dune"\?',
+        ):
+            collection.remove_book(" Dune ")
 
     def test_restores_book_when_save_fails(self, collection, monkeypatch):
         collection.add_book("Dune", "Frank Herbert", 1965)
@@ -288,6 +335,20 @@ class TestRemoveBook:
             collection.remove_book("Dune")
 
         assert collection.find_book_by_title("Dune") is not None
+
+    def test_restores_book_to_original_position_when_save_fails(self, collection, monkeypatch):
+        collection.add_book("Dune", "Frank Herbert", 1965)
+        collection.add_book("1984", "George Orwell", 1949)
+
+        def fail_save():
+            raise StorageError("save failed")
+
+        monkeypatch.setattr(collection, "save_books", fail_save)
+
+        with pytest.raises(StorageError, match="save failed"):
+            collection.remove_book("Dune")
+
+        assert [book.title for book in collection.list_books()] == ["Dune", "1984"]
 
 
 class TestFindByAuthor:

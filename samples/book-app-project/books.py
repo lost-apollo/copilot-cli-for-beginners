@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from difflib import get_close_matches
 import json
 from dataclasses import dataclass, asdict
 from typing import Iterator, List, Optional, TextIO
@@ -28,6 +29,47 @@ class Book:
     author: str
     year: int
     read: bool = False
+
+
+def normalize_text(value: str) -> str:
+    """Normalize text for user-friendly, case-insensitive comparisons."""
+    return value.casefold()
+
+
+def find_similar_titles(books: List["Book"], title: str) -> List[str]:
+    """Find likely title matches to help users recover from a failed lookup."""
+    normalized_title = normalize_text(title)
+    if not normalized_title:
+        return []
+
+    normalized_to_title: dict[str, str] = {}
+    normalized_titles: List[str] = []
+    for book in books:
+        normalized_book_title = normalize_text(book.title)
+        if normalized_book_title not in normalized_to_title:
+            normalized_to_title[normalized_book_title] = book.title
+            normalized_titles.append(normalized_book_title)
+
+    suggestions: List[str] = []
+    for normalized_book_title in normalized_titles:
+        if (
+            normalized_title in normalized_book_title
+            or normalized_book_title in normalized_title
+        ):
+            suggestions.append(normalized_to_title[normalized_book_title])
+
+    close_matches = get_close_matches(
+        normalized_title,
+        normalized_titles,
+        n=3,
+        cutoff=0.6,
+    )
+    for normalized_book_title in close_matches:
+        title_match = normalized_to_title[normalized_book_title]
+        if title_match not in suggestions:
+            suggestions.append(title_match)
+
+    return suggestions
 
 
 def validate_required_text(value: str, field_name: str) -> None:
@@ -240,8 +282,9 @@ class BookCollection:
             'Frank Herbert'
         """
         validate_required_text(title, "Title")
+        normalized_title = normalize_text(title)
         for book in self.books:
-            if book.title.lower() == title.lower():
+            if normalize_text(book.title) == normalized_title:
                 return book
         return None
 
@@ -300,15 +343,23 @@ class BookCollection:
             >>> collection.find_book_by_title("Dune") is None
             True
         """
+        requested_title = title
         book = self.find_book_by_title(title)
         if book is None:
-            raise BookNotFoundError(f'Book "{title}" was not found.')
+            close_matches = find_similar_titles(self.books, title)
+            if close_matches:
+                suggestions = ", ".join(f'"{match}"' for match in close_matches)
+                raise BookNotFoundError(
+                    f'Book "{requested_title}" was not found. Did you mean {suggestions}?'
+                )
+            raise BookNotFoundError(f'Book "{requested_title}" was not found.')
 
-        self.books.remove(book)
+        original_index = self.books.index(book)
+        self.books.pop(original_index)
         try:
             self.save_books()
         except StorageError:
-            self.books.append(book)
+            self.books.insert(original_index, book)
             raise
 
     def find_by_author(self, author: str) -> List[Book]:
@@ -331,4 +382,5 @@ class BookCollection:
             1
         """
         validate_required_text(author, "Author")
-        return [b for b in self.books if b.author.lower() == author.lower()]
+        normalized_author = normalize_text(author)
+        return [b for b in self.books if normalize_text(b.author) == normalized_author]
