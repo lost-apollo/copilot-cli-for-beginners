@@ -1,62 +1,48 @@
 import sys
-from books import BookCollection
+from books import BookAppError, BookCollection
+from utils import get_book_details, get_required_input, print_books
 
 
-# Global collection instance
-collection = BookCollection()
+collection: BookCollection | None = None
 
 
-def show_books(books):
-    """Display books in a user-friendly format."""
-    if not books:
-        print("No books found.")
-        return
+def get_collection() -> BookCollection:
+    global collection
 
-    print("\nYour Book Collection:\n")
+    if collection is None:
+        collection = BookCollection()
 
-    for index, book in enumerate(books, start=1):
-        status = "✓" if book.read else " "
-        print(f"{index}. [{status}] {book.title} by {book.author} ({book.year})")
-
-    print()
+    return collection
 
 
 def handle_list():
-    books = collection.list_books()
-    show_books(books)
+    books = get_collection().list_books()
+    print_books(books)
 
 
 def handle_add():
     print("\nAdd a New Book\n")
 
-    title = input("Title: ").strip()
-    author = input("Author: ").strip()
-    year_str = input("Year: ").strip()
-
-    try:
-        year = int(year_str) if year_str else 0
-        collection.add_book(title, author, year)
-        print("\nBook added successfully.\n")
-    except ValueError as e:
-        print(f"\nError: {e}\n")
+    title, author, year = get_book_details()
+    get_collection().add_book(title, author, year)
+    print("\nBook added successfully.\n")
 
 
 def handle_remove():
     print("\nRemove a Book\n")
 
-    title = input("Enter the title of the book to remove: ").strip()
-    collection.remove_book(title)
-
-    print("\nBook removed if it existed.\n")
+    title = get_required_input("Enter the title of the book to remove: ", "Title")
+    get_collection().remove_book(title)
+    print("\nBook removed successfully.\n")
 
 
 def handle_find():
     print("\nFind Books by Author\n")
 
-    author = input("Author name: ").strip()
-    books = collection.find_by_author(author)
+    author = get_required_input("Author name: ", "Author name")
+    books = get_collection().find_by_author(author)
 
-    show_books(books)
+    print_books(books)
 
 
 def show_help():
@@ -72,6 +58,15 @@ Commands:
 """)
 
 
+COMMAND_HANDLERS = {
+    "list": handle_list,
+    "add": handle_add,
+    "remove": handle_remove,
+    "find": handle_find,
+    "help": show_help,
+}
+
+
 def main():
     if len(sys.argv) < 2:
         show_help()
@@ -79,19 +74,16 @@ def main():
 
     command = sys.argv[1].lower()
 
-    if command == "list":
-        handle_list()
-    elif command == "add":
-        handle_add()
-    elif command == "remove":
-        handle_remove()
-    elif command == "find":
-        handle_find()
-    elif command == "help":
-        show_help()
-    else:
+    handler = COMMAND_HANDLERS.get(command)
+    if handler is None:
         print("Unknown command.\n")
         show_help()
+        return
+
+    try:
+        handler()
+    except BookAppError as error:
+        print(f"\nError: {error}\n")
 
 
 if __name__ == "__main__":
