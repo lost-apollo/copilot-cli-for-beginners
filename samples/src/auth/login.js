@@ -4,10 +4,9 @@
 
 async function handleLogin(email, password) {
   const normalizedEmail = typeof email === 'string' ? email.trim() : '';
-  const normalizedPassword = typeof password === 'string' ? password.trim() : '';
 
   // Basic validation
-  if (!normalizedEmail || !normalizedPassword) {
+  if (!normalizedEmail || typeof password !== 'string' || !password.trim()) {
     throw new Error('Email and password are required');
   }
 
