@@ -1,4 +1,15 @@
-![Chapter 02: Context and Conversations](images/chapter-header.png)
+<!--
+---
+id: CopilotCLI-02
+title: !translate Context and Conversations
+description: !translate Use file and directory context, resume previous sessions, and write effective multi-turn conversations with GitHub Copilot CLI.
+audience: Developers / Students / Terminal users
+slug: context-and-conversations
+weight: 3
+---
+-->
+
+![Chapter 02: Context and Conversations](assets/chapter-header.png)
 
 > **What if AI could see your entire codebase, not just one file at a time?**
 
@@ -20,7 +31,7 @@ By the end of this chapter, you'll be able to:
 
 ## 🧩 Real-World Analogy: Working with a Colleague
 
-<img src="images/colleague-context-analogy.png" alt="Context Makes the Difference - Without vs With Context" width="800"/>
+<img src="assets/colleague-context-analogy.png" alt="Context Makes the Difference - Without vs With Context" width="800"/>
 
 *Just like your colleagues, Copilot CLI isn't a mind reader. Providing more information helps humans and Copilot alike provide targeted support!*
 
@@ -36,7 +47,7 @@ To provide context to Copilot CLI use *the `@` syntax* to point Copilot CLI at s
 
 # Essential: Basic Context
 
-<img src="images/essential-basic-context.png" alt="Glowing code blocks connected by light trails representing how context flows through Copilot CLI conversations" width="800"/>
+<img src="assets/essential-basic-context.png" alt="Glowing code blocks connected by light trails representing how context flows through Copilot CLI conversations" width="800"/>
 
 This section covers everything you need to work effectively with context. Master these basics first.
 
@@ -89,7 +100,7 @@ copilot
 <details>
 <summary>🎬 See it in action!</summary>
 
-![File Context Demo](images/file-context-demo.gif)
+![File Context Demo](assets/file-context-demo.gif)
 
 *Demo output varies. Your model, tools, and responses will differ from what's shown here.*
 
@@ -119,7 +130,7 @@ copilot
 
 This is where context becomes a superpower. Single-file analysis is useful. Cross-file analysis is transformative.
 
-<img src="images/cross-file-intelligence.png" alt="Cross-File Intelligence - comparing single-file vs cross-file analysis showing how analyzing files together reveals bugs, data flow, and patterns invisible in isolation" width="800"/>
+<img src="assets/cross-file-intelligence.png" alt="Cross-File Intelligence - comparing single-file vs cross-file analysis showing how analyzing files together reveals bugs, data flow, and patterns invisible in isolation" width="800"/>
 
 ### Demo: Find Bugs That Span Multiple Files
 
@@ -142,7 +153,7 @@ copilot
 <details>
 <summary>🎬 See it in action!</summary>
 
-![Multi-File Demo](images/multi-file-demo.gif)
+![Multi-File Demo](assets/multi-file-demo.gif)
 
 *Demo output varies. Your model, tools, and responses will differ from what's shown here.*
 
@@ -185,7 +196,7 @@ Cross-Module Analysis
 
 ### Demo: Understand a Codebase in 60 Seconds
 
-<img src="images/codebase-understanding.png" alt="Split-screen comparison showing manual code review taking 1 hour versus AI-assisted analysis taking 10 seconds" width="800" />
+<img src="assets/codebase-understanding.png" alt="Split-screen comparison showing manual code review taking 1 hour versus AI-assisted analysis taking 10 seconds" width="800" />
 
 New to a project? Learn about it quickly using Copilot CLI.
 
@@ -253,7 +264,7 @@ copilot
 <details>
 <summary>🎬 See a multi-turn conversation in action!</summary>
 
-![Multi-Turn Demo](images/multi-turn-demo.gif)
+![Multi-Turn Demo](assets/multi-turn-demo.gif)
 
 *Demo output varies. Your model, tools, and responses will differ from what's shown here.*
 
@@ -403,7 +414,7 @@ Context usage: 62k/200k tokens (31%)
 
 ### Pick Up Where You Left Off
 
-<img src="images/session-persistence-timeline.png" alt="Timeline showing how GitHub Copilot CLI sessions persist across days - start on Monday, resume on Wednesday with full context restored" width="800"/>
+<img src="assets/session-persistence-timeline.png" alt="Timeline showing how GitHub Copilot CLI sessions persist across days - start on Monday, resume on Wednesday with full context restored" width="800"/>
 
 *Sessions auto-save when you exit. Resume days later with full context: files, issues, and progress all remembered.*
 
@@ -462,7 +473,7 @@ No re-explaining. No re-reading files. Just continue working.
 
 # Optional: Going Deeper
 
-<img src="images/optional-going-deeper.png" alt="Abstract crystal cave in blue and purple tones representing deeper exploration of context concepts" width="800"/>
+<img src="assets/optional-going-deeper.png" alt="Abstract crystal cave in blue and purple tones representing deeper exploration of context concepts" width="800"/>
 
 These topics build on the essentials above. **Pick what interests you, or skip ahead to [Practice](#practice).**
 
@@ -574,7 +585,7 @@ You already know `/context` and `/clear` from the essentials. Here's the deeper 
 
 Every AI has a "context window," which is the amount of text it can consider at once.
 
-<img src="images/context-window-visualization.png" alt="Context Window Visualization" width="800"/>
+<img src="assets/context-window-visualization.png" alt="Context Window Visualization" width="800"/>
 
 *The context window is like a desk: it can only hold so much at once. Files, conversation history, and system prompts all take space.*
 
@@ -737,9 +748,9 @@ You can include images in your conversations using the `@` syntax, or simply **p
 ```bash
 copilot
 
-> @images/screenshot.png What is happening in this image?
+> @assets/screenshot.png What is happening in this image?
 
-> @images/mockup.png Write the HTML and CSS to match this design. Place it in a new file called index.html and put the CSS in styles.css.
+> @assets/mockup.png Write the HTML and CSS to match this design. Place it in a new file called index.html and put the CSS in styles.css.
 ```
 
 > 📖 **Learn more**: See [Additional Context Features](../appendices/additional-context.md#working-with-images) for supported formats, practical use cases, and tips for combining images with code.
@@ -750,7 +761,7 @@ copilot
 
 # Practice
 
-<img src="../images/practice.png" alt="Warm desk setup with monitor showing code, lamp, coffee cup, and headphones ready for hands-on practice" width="800"/>
+<img src="../assets/practice.png" alt="Warm desk setup with monitor showing code, lamp, coffee cup, and headphones ready for hands-on practice" width="800"/>
 
 Time to apply your context and session management skills.
 
